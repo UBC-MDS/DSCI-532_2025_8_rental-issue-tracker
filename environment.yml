@@ -13,4 +13,4 @@ dependencies:
   - pip=25.0.1
   - python=3.13.1
   - pip:
-      - dash-vega-components
+      - dash-vega-components==0.0.1
