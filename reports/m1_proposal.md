@@ -15,17 +15,20 @@ We will be using two datasets from the Vancouver Open Data portal to explore the
 This dataset contains property assessment values, tax information, and zoning details for properties in Vancouver.
 
 - **Key attributes:**
-  - `PID`, `from_civic_number`, `street_name`: Unique property identifiers and address details.
+  - `PID`, `FROM_CIVIC_NUMBER`, `TO_CIVIC_NUMBER`, `STREET_NAME`: Unique property identifiers and address details.
   - `CURRENT_LAND_VALUE`, `CURRENT_IMPROVEMENT_VALUE`: Assessed property value.
   - `TAX_LEVY`: Total property tax levied.
   - `YEAR_BUILT`, `BIG_IMPROVEMENT_YEAR`: Construction and renovation details.
-  - `ZONING_DISTRICT`: Classification of property zones.
+  - `ZONING_CLASSIFICATION`: Classification of property zones.
 
 ### **2. Rental Standards - Current Issues**
 
-This dataset records **unresolved rental issues** in multi-unit buildings (5+ units).
+This dataset records **unresolved rental issues** in multi-unit buildings (5+ units). The dataset is updated daily, so for now we
+will be using the database as obtained on **January 10th, 2025**.
 
 - **Key attributes:**
+  - `business_operator`: The landlord and/or property management company associated to the property.
+  - `DetailURL`: Address of the webpage which contains additional information on the current by-law issue(s).
   - `streetnumber`, `street`: Property address for merging datasets.
   - `TOTALOUTSTANDING`: Count of unresolved rental issues.
   - `TotalUnits`: Number of rental units per property.
@@ -39,6 +42,8 @@ This analysis will help identify trends and challenges in Vancouver’s rental m
 
 - Which neighborhoods have the highest number of property by-law violations?
 - Which districts have the lowest property values?
+- Which zoning classifications have the highest number of by-law violations?
+- Are there any property management companies that are frequently associated to rental issues?
 - Is there a correlation between property values and the number of outstanding violations?
 
 ### Usage Scenarios
