@@ -25,6 +25,20 @@ df = pd.read_csv('data/clean/rentals_with_property_value.csv')
 
 # Create horizontal bar chart function
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
+    """
+    Creates a horizontal bar chart using Altair.
+
+    Args:
+        data (pd.DataFrame): The data source for the chart.
+        x_col (str): The column name to be used for the x-axis (horizontal axis).
+        y_col (str): The column name to be used for the y-axis (vertical axis).
+        title (str): The title of the chart.
+        x_title (str, optional): Custom title for the x-axis. Defaults to None, which uses x_col as the title.
+        y_title (str, optional): Custom title for the y-axis. Defaults to None, which uses y_col as the title.
+
+    Returns:
+        alt.Chart: An Altair chart object representing the bar chart.
+    """
     if x_title is None:
         x_title = x_col
     if y_title is None:
