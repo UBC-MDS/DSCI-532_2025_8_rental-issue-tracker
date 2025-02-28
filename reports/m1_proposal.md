@@ -34,6 +34,7 @@ will be using the database as obtained on **January 10th, 2025**.
   - `TotalUnits`: Number of rental units per property.
   - `Geo Local Area`, `geo_point_2d`: Neighborhood and geolocation data.
 
+The Property Tax Report dataset has 224,726 rows and 7 columns, while the Rental Standards dataset has 466 rows and 9 columns.
 This analysis will help identify trends and challenges in Vancouver’s rental market.
 
 ## Research questions and usage scenarios
