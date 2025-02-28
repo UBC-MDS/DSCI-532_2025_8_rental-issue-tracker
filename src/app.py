@@ -9,6 +9,9 @@ data = pd.DataFrame({
     'Issues': [100, 150, 200, 250, 300, 350]
 })
 
+# Load data for bar chart
+df = pd.read_csv('data/clean/rentals_with_property_value.csv')
+
 def create_pie_chart(data):
     chart = alt.Chart(data, title='Number of Rental Issues').mark_arc().encode(
         theta=alt.Theta('Issues', type='quantitative'),
@@ -19,9 +22,6 @@ def create_pie_chart(data):
         height=400
     )
     return chart
-
-# Load data for bar chart
-df = pd.read_csv('data/clean/rentals_with_property_value.csv')
 
 # Create horizontal bar chart function
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
@@ -39,31 +39,59 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
     ).interactive()
     return chart
 
+# Create scatter plot
+def create_scatter_plot(data, x_col, y_col, tooltip, title, x_title=None, y_title=None):
+    if x_title is None:
+        x_title = x_col
+    if y_title is None:
+        y_title = y_col
+    
+    points = alt.Chart(data).mark_point().encode(
+        y=alt.Y(y_col, title=y_title),
+        x=alt.X(x_col, title=x_title),
+        tooltip=[tooltip]
+    )
+
+    fit_line = points.transform_regression(x_col, y_col).mark_line()
+
+    chart = (points + fit_line).properties(
+        title=title
+    ).interactive()
+
+    return chart
+
 # Initialize the app
 app = Dash(__name__)
 
-# Layout - includes pie and bar charts
+# Layout
 app.layout = html.Div([
+    # TODO: add map here
     html.Div([
+        
+    ], style={'width': '50%', 'display': 'inline-block'}),
+    
+    html.Div([
+        # TODO: add pie chart here
         html.Iframe(
             id='pie-chart',
-            height='500',
-            width='500',
-            style={'border-width': '0'}
-        )
-    ], style={'width': '30%', 'display': 'inline-block'}),
+            style={'width': '100%', 'height': '400px', 'border': 'none'}
+        ),
 
-    # Bar chart Iframe
-    html.Div([
+        # Bar chart
         html.Iframe(
             id='bar-chart',
-            height='500',
-            width='700',
-            style={'border-width': '0'}
+            style={'width': '100%', 'height': '300px', 'border': 'none'}
+        ),
+
+        # Scatter plot
+        html.Iframe(
+            id='scatter-plot',
+            style={'width': '100%', 'height': '400px', 'border': 'none'}
         )
-    ], style={'width': '70%', 'display': 'inline-block', 'vertical-align': 'top'}),
+    ], style={'width': '50%', 'display': 'inline-block', 'vertical-align': 'top'}),
 
     html.Div([
+        # TODO: update dropdown list with actual region values
         html.Label('Select a Region:'),
         dcc.Dropdown(
             id='region-dropdown',
@@ -89,15 +117,41 @@ def update_pie_chart(id):
     Input('region-dropdown', 'value')
 )
 def update_bar_chart(selected_region):
-    aggregated_df = df.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+    if selected_region:
+        filtered_df = df[df['geo_local_area'] == selected_region]
+        aggregated_df = filtered_df.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+    else:
+        aggregated_df = df.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
 
     chart = create_bar_chart(
         data=aggregated_df,
         x_col='total_outstanding',
         y_col='zoning_classification',
-        title='Total Outstanding Issues by Zoning Classification (Global)',
+        title='Total Outstanding Issues by Zoning Classification',
         x_title='Total Outstanding Issues',
         y_title='Zoning Classification'
+    )
+    return chart.to_html()
+
+# Callback for scatter plot
+@app.callback(
+    Output('scatter-plot', 'srcDoc'),
+    Input('region-dropdown', 'value')
+)
+def update_scatter_plot(selected_region):
+    if selected_region:
+        filtered_df = df[df['geo_local_area'] == selected_region]
+    else:
+        filtered_df = df
+
+    chart = create_scatter_plot(
+        data=filtered_df,
+        x_col='current_land_value',
+        y_col='total_outstanding',
+        tooltip='geo_local_area',
+        title='Property Prices vs Outstanding Issues',
+        x_title='Property Prices',
+        y_title='Outstanding Issues'
     )
     return chart.to_html()
 
