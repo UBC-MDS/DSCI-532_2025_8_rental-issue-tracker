@@ -5,22 +5,43 @@ from dash.dependencies import Input, Output
 
 # Sample data for pie chart
 data = pd.DataFrame({
-    'Location': ['Downtown', 'Hastings-Sunrise', 'Kitsilano', 'Marpole', 'Grandview-Woodland', 'Other'],
+    'Location': ['Downtown', 'Hastings-Sunrise', 'Kitsilano', 'Marpole',
+                'Grandview-Woodland', 'Other'],
+    'Location': ['Downtown', 'Hastings-Sunrise', 'Kitsilano', 'Marpole',
+                'Grandview-Woodland', 'Other'],
     'Issues': [100, 150, 200, 250, 300, 350]
 })
 
 # Load data for bar chart
-df = pd.read_csv('data/clean/rentals_with_property_value.csv')
+property_values = pd.read_csv('data/clean/rentals_with_property_value.csv')
+issues = pd.read_csv('data/clean/rental_issues_clean.csv')
 
-def create_pie_chart(data):
-    chart = alt.Chart(data, title='Number of Rental Issues').mark_arc().encode(
-        theta=alt.Theta('Issues', type='quantitative'),
-        color=alt.Color('Location', type='nominal'),
-        tooltip=['Location', 'Issues']
-    ).properties(
-        width=400,
-        height=400
+
+def create_pie_chart(data, selected_region):
+
+    base = alt.Chart(data, title='Number of Rental Issues').mark_arc().encode(
+        theta=alt.Theta('total_outstanding', type='quantitative'),
+        tooltip=['geo_local_area', 'total_outstanding']
     )
+
+    if selected_region is not None:
+        chart = base.encode(
+            color=alt.condition(
+                alt.datum.geo_local_area == selected_region,
+                alt.Color('geo_local_area:N', title='Local Area'),
+                alt.value('gray'),
+            ),
+            opacity=alt.condition(
+                alt.datum.geo_local_area == selected_region,
+                alt.value(1.0),
+                alt.value(0.2)
+            )
+        )
+    else:
+        # If no selected_location, use full color for all
+        chart = base.encode(
+            color=alt.Color('geo_local_area:N', title='Local Area')
+        )
     return chart
 
 # Create horizontal bar chart function
@@ -96,9 +117,9 @@ app.layout = html.Div([
         dcc.Dropdown(
             id='region-dropdown',
             options=[
-                {'label': loc, 'value': loc} for loc in df['geo_local_area'].unique()
+                {'label': loc, 'value': loc} for loc in property_values['geo_local_area'].unique()
             ],
-            value=df['geo_local_area'].unique()[0] if df['geo_local_area'].unique().size > 0 else None
+            value=property_values['geo_local_area'].unique()[0] if property_values['geo_local_area'].unique().size > 0 else None
         )
     ], style={'width': '100%', 'padding': '20px', 'display': 'block'})
 ], style={'width': '100%'})
@@ -106,10 +127,11 @@ app.layout = html.Div([
 # Callback for pie chart
 @app.callback(
     Output('pie-chart', 'srcDoc'),
-    Input('pie-chart', 'id')
+    Input('region-dropdown', 'value')
 )
-def update_pie_chart(id):
-    return create_pie_chart(data).to_html()
+def update_pie_chart(selected_region):
+    aggregated_property_values = issues.groupby('geo_local_area')['total_outstanding'].sum().reset_index()
+    return create_pie_chart(aggregated_property_values, selected_region).to_html()
 
 # Callback for bar chart (Global view)
 @app.callback(
@@ -118,13 +140,13 @@ def update_pie_chart(id):
 )
 def update_bar_chart(selected_region):
     if selected_region:
-        filtered_df = df[df['geo_local_area'] == selected_region]
-        aggregated_df = filtered_df.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+        filtered_property_values = property_values[property_values['geo_local_area'] == selected_region]
+        aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
     else:
-        aggregated_df = df.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+        aggregated_property_values = property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
 
     chart = create_bar_chart(
-        data=aggregated_df,
+        data=aggregated_property_values,
         x_col='total_outstanding',
         y_col='zoning_classification',
         title='Total Outstanding Issues by Zoning Classification',
@@ -140,12 +162,12 @@ def update_bar_chart(selected_region):
 )
 def update_scatter_plot(selected_region):
     if selected_region:
-        filtered_df = df[df['geo_local_area'] == selected_region]
+        filtered_property_values = property_values[property_values['geo_local_area'] == selected_region]
     else:
-        filtered_df = df
+        filtered_property_values = property_values
 
     chart = create_scatter_plot(
-        data=filtered_df,
+        data=filtered_property_values,
         x_col='current_land_value',
         y_col='total_outstanding',
         tooltip='geo_local_area',
