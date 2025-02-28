@@ -74,23 +74,24 @@ app.layout = html.Div([
         # TODO: add pie chart here
         html.Iframe(
             id='pie-chart',
-            style={'width': '100%', 'height': '200px', 'border': 'none'}
+            style={'width': '100%', 'height': '400px', 'border': 'none'}
         ),
 
         # Bar chart
         html.Iframe(
             id='bar-chart',
-            style={'width': '100%', 'height': '200px', 'border': 'none'}
+            style={'width': '100%', 'height': '300px', 'border': 'none'}
         ),
 
         # Scatter plot
         html.Iframe(
             id='scatter-plot',
-            style={'width': '100%', 'height': '300px', 'border': 'none'}
+            style={'width': '100%', 'height': '400px', 'border': 'none'}
         )
     ], style={'width': '50%', 'display': 'inline-block', 'vertical-align': 'top'}),
 
     html.Div([
+        # TODO: update dropdown list with actual region values
         html.Label('Select a Region:'),
         dcc.Dropdown(
             id='region-dropdown',
