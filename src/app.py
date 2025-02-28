@@ -11,7 +11,8 @@ def create_pie_chart(data, selected_region):
 
     base = alt.Chart(data, title='Number of Rental Issues').mark_arc().encode(
         theta=alt.Theta('total_outstanding', type='quantitative'),
-        tooltip=['geo_local_area', 'total_outstanding']
+        tooltip=['geo_local_area', 'total_outstanding'],
+        order=alt.Order('total_outstanding:Q', sort='descending')
     )
 
     if selected_region is not None:
