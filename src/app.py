@@ -3,16 +3,6 @@ import altair as alt
 import pandas as pd
 from dash.dependencies import Input, Output
 
-# Sample data for pie chart
-data = pd.DataFrame({
-    'Location': ['Downtown', 'Hastings-Sunrise', 'Kitsilano', 'Marpole',
-                'Grandview-Woodland', 'Other'],
-    'Location': ['Downtown', 'Hastings-Sunrise', 'Kitsilano', 'Marpole',
-                'Grandview-Woodland', 'Other'],
-    'Issues': [100, 150, 200, 250, 300, 350]
-})
-
-# Load data for bar chart
 property_values = pd.read_csv('data/clean/rentals_with_property_value.csv')
 issues = pd.read_csv('data/clean/rental_issues_clean.csv')
 
