@@ -9,3 +9,4 @@ pip==25.0.1
 pandas==2.2.3
 pyjanitor==0.30.0
 dash-vega-components==0.11.0
+gunicorn==23.0.0
