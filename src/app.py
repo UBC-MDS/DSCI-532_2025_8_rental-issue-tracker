@@ -7,10 +7,6 @@ import dash_leaflet as dl
 property_values = pd.read_csv('data/clean/rentals_with_property_value.csv',index_col=0)
 issues = pd.read_csv('data/clean/rental_issues_clean.csv',index_col=0)
 
-# join both dataframes above to fill map
-issues_values_joined = pd.merge(issues,property_values,how='left').drop_duplicates(subset=['lat','long'])
-issues_values_joined['zoning_classification'] = issues_values_joined['zoning_classification'].astype(str).replace("nan", "N/A")
-
 # dictionary that maps zoning classes to icon colors
 zone_icon_dict = {
     'Commercial':('blue','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'),
@@ -46,15 +42,17 @@ def create_map_icon(row):
     '''
     Given a row from the dataframe, create an icon with tooltip info on map.
     '''
-    
-    property_value = 'N/A' if pd.isna(row['current_land_value']) else f'${row['current_land_value']:,.2f}'
+    tooltip_text = f"Zoning Type: {row['zoning_classification']}"  # Store tooltip text
+
+    print(f"Creating marker: {tooltip_text}")  # Debugging print
+
     
     content = f"""
     Operator: {row['business_operator']}<br>
     Address: {row['street_number']} {row['street']}<br>
     Zoning Type: {row['zoning_classification']}<br>
     Units: {row['total_units']}<br>
-    Value: {property_value}<br>
+    Value: ${row['current_land_value']:,.2f}<br>
     <b>Issues:<b/> {row['total_outstanding']}    
     """
     
@@ -154,7 +152,7 @@ app.layout = html.Div([
             style={'width': '100%', 'height': '400px'},
             children=[
                 dl.TileLayer(),
-                *create_map_icons(issues_values_joined)
+                *create_map_icons(property_values)
             ],
             center=[49.272877, -123.078896],
             zoom=11.2,
@@ -211,28 +209,30 @@ app.layout = html.Div([
     Input('region-dropdown', 'value'),
     Input('zoning-dropdown','value')
 )
-def update_map(selected_region,selected_zone):    
+def update_map(selected_region, selected_zone):    
     # Default center and zoom
+    icon_data = property_values.copy()
+    center = [49.272877, -123.078896]  # Default center
+    zoom = 11.2  # Default zoom
     
-    icon_data = issues_values_joined
-    center = [49.272877, -123.078896]
-    zoom = 11.2
-
+    # zoom to selected neighborhood
     if selected_region:
-        map_position = geo_location_dict[selected_region]
-        center = map_position['center']
-        zoom = map_position['zoom']
-        
+        center = geo_location_dict[selected_region]['center']
+        zoom = geo_location_dict[selected_region]['zoom']
+    
+    # Apply zoning filter
     if selected_zone:
         icon_data = icon_data[icon_data['zoning_classification'] == selected_zone]
     
-    children=[
-        dl.TileLayer(),
-        *create_map_icons(icon_data)]
-
+    # Force refresh by resetting children with filtered markers
+    children = [
+        dl.TileLayer(),  
+        *create_map_icons(icon_data)
+    ]
+    
+    # Return the updated center, zoom, and children (markers)
     return center, zoom, children
-
-        
+      
 # Callback for pie chart
 @app.callback(
     Output('pie-chart', 'srcDoc'),
