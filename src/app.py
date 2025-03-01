@@ -47,7 +47,7 @@ def create_map_icon(row):
     '''
     Given a row from the dataframe, create an icon with tooltip info on map.
     '''
-    property_value = 'N/A' if pd.isna(row['current_land_value']) else f'${row['current_land_value']:,.2f}'
+    property_value = 'N/A' if pd.isna(row['current_land_value']) else f"${row['current_land_value']:,.2f}"
     
     
     content = f"""
