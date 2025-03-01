@@ -7,6 +7,11 @@ import dash_leaflet as dl
 property_values = pd.read_csv('data/clean/rentals_with_property_value.csv',index_col=0)
 issues = pd.read_csv('data/clean/rental_issues_clean.csv',index_col=0)
 
+# left join two dataframes above
+issues_values_joined = pd.merge(issues,property_values,how='left').drop_duplicates(subset=['lat','long'])
+issues_values_joined['zoning_classification'] = issues_values_joined['zoning_classification'].astype(str).replace("nan", "N/A")
+
+
 # dictionary that maps zoning classes to icon colors
 zone_icon_dict = {
     'Commercial':('blue','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'),
@@ -19,40 +24,38 @@ zone_icon_dict = {
 
 # dictionary that gives locations of neighborhoods on map
 geo_location_dict = {
-    'Arbutus Ridge':{'zoom':14.27,'center':[49.2467288,-123.1594228]},
-    'Downtown':{'zoom':14.64,'center':[49.2790925,-123.1147099]},
-    'Dunbar-Southlands':{'zoom':14.12,'center':[49.2489659,-123.1860719]},
-    'Fairview':{'zoom':14.47,'center':[49.2654975,-123.1282056]},
-    'Grandview-Woodland':{'zoom':14.01,'center':[49.2759762,-123.0682878]},
-    'Hastings-Sunrise':{'zoom':14,'center':[49.2778156,-123.0422014]},
-    'Kensington-Cedar Cottage':{'zoom':14.11,'center':[49.2471833,-123.0769395]},
-    'Killarney':{'zoom':13.98,'center':[49.2180367,-123.0383941]},
-    'Kitsilano':{'zoom':14.36,'center':[49.2674605,-123.1642213]},
-    'Marpole':{'zoom':14.56,'center':[49.2104717,-123.130635]},
-    'Mount Pleasant':{'zoom':14.73,'center':[49.2647148,-123.0978001]},
-    'Renfrew-Collingwood':{'zoom':13.91,'center':[49.2483732,-123.0386256]},
-    'Riley Park':{'zoom':14.38,'center':[49.24452,-123.1020171]},
-    'Shaughnessy':{'zoom':14.4,'center':[49.2456008,-123.1415797]},
-    'Strathcona':{'zoom':15.04,'center':[49.2725961,-123.0887926]},
-    'Sunset':{'zoom':14.18,'center':[49.2188485,-123.0911351]},
-    'West End':{'zoom':14.81,'center':[49.2853688,-123.1342539]}
+    'Arbutus Ridge':{'zoom':14.17,'center':[49.2467288,-123.1594228]},
+    'Downtown':{'zoom':14.54,'center':[49.2790925,-123.1147099]},
+    'Dunbar-Southlands':{'zoom':14.02,'center':[49.2489659,-123.1860719]},
+    'Fairview':{'zoom':14.37,'center':[49.2654975,-123.1282056]},
+    'Grandview-Woodland':{'zoom':13.91,'center':[49.2759762,-123.0682878]},
+    'Hastings-Sunrise':{'zoom':13,'center':[49.2778156,-123.0422014]},
+    'Kensington-Cedar Cottage':{'zoom':14.01,'center':[49.2471833,-123.0769395]},
+    'Killarney':{'zoom':13.78,'center':[49.2180367,-123.0383941]},
+    'Kitsilano':{'zoom':14.26,'center':[49.2674605,-123.1642213]},
+    'Marpole':{'zoom':14.46,'center':[49.2104717,-123.130635]},
+    'Mount Pleasant':{'zoom':14.63,'center':[49.2647148,-123.0978001]},
+    'Renfrew-Collingwood':{'zoom':13.81,'center':[49.2483732,-123.0386256]},
+    'Riley Park':{'zoom':14.28,'center':[49.24452,-123.1020171]},
+    'Shaughnessy':{'zoom':14.3,'center':[49.2456008,-123.1415797]},
+    'Strathcona':{'zoom':14.94,'center':[49.2725961,-123.0887926]},
+    'Sunset':{'zoom':14.08,'center':[49.2188485,-123.0911351]},
+    'West End':{'zoom':14.71,'center':[49.2853688,-123.1342539]}
 }
 
 def create_map_icon(row):
     '''
     Given a row from the dataframe, create an icon with tooltip info on map.
     '''
-    tooltip_text = f"Zoning Type: {row['zoning_classification']}"  # Store tooltip text
-
-    print(f"Creating marker: {tooltip_text}")  # Debugging print
-
+    property_value = 'N/A' if pd.isna(row['current_land_value']) else f'${row['current_land_value']:,.2f}'
+    
     
     content = f"""
     Operator: {row['business_operator']}<br>
     Address: {row['street_number']} {row['street']}<br>
     Zoning Type: {row['zoning_classification']}<br>
     Units: {row['total_units']}<br>
-    Value: ${row['current_land_value']:,.2f}<br>
+    Value: {property_value}<br>
     <b>Issues:<b/> {row['total_outstanding']}    
     """
     
@@ -61,8 +64,10 @@ def create_map_icon(row):
     long = row['long']
     zoning_class = row['zoning_classification']
     icon_url = zone_icon_dict[zoning_class][1]
+    id = int(row.name) # id for each marker
     
     return dl.Marker(
+        id=str(id),
         position=[lat,long],
         children=[dl.Tooltip(content=content)],
         icon={'iconUrl':icon_url}
@@ -203,15 +208,14 @@ app.layout = html.Div([
 
 # Callback for map
 @app.callback(
-    Output('city-map', 'center'),
-    Output('city-map', 'zoom'),
+    Output('city-map', 'viewport'),
     Output('city-map', 'children'),
     Input('region-dropdown', 'value'),
     Input('zoning-dropdown','value')
 )
 def update_map(selected_region, selected_zone):    
     # Default center and zoom
-    icon_data = property_values.copy()
+    icon_data = issues_values_joined.copy()
     center = [49.272877, -123.078896]  # Default center
     zoom = 11.2  # Default zoom
     
@@ -224,14 +228,13 @@ def update_map(selected_region, selected_zone):
     if selected_zone:
         icon_data = icon_data[icon_data['zoning_classification'] == selected_zone]
     
-    # Force refresh by resetting children with filtered markers
     children = [
         dl.TileLayer(),  
         *create_map_icons(icon_data)
     ]
     
     # Return the updated center, zoom, and children (markers)
-    return center, zoom, children
+    return {'center':center, 'zoom':zoom,'transition':"flyTo"}, children
       
 # Callback for pie chart
 @app.callback(
@@ -249,10 +252,10 @@ def update_pie_chart(selected_region):
 )
 def update_bar_chart(selected_region):
     if selected_region:
-        filtered_property_values = property_values[property_values['geo_local_area'] == selected_region]
+        filtered_property_values = issues_values_joined[issues_values_joined['geo_local_area'] == selected_region]
         aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
     else:
-        aggregated_property_values = property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+        aggregated_property_values = issues_values_joined.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
 
     chart = create_bar_chart(
         data=aggregated_property_values,
