@@ -74,6 +74,7 @@ def create_scatter_plot(data, x_col, y_col, tooltip, title, x_title=None, y_titl
 
 # Initialize the app
 app = Dash(__name__)
+server = app.server
 
 # Layout
 app.layout = html.Div([
@@ -170,4 +171,4 @@ def update_scatter_plot(selected_region):
 
 # Run the app/dashboard
 if __name__ == '__main__':
-    app.server.run(debug=True, host='127.0.0.1', port=8050)
+    app.server.run(host='127.0.0.1', port=8050)
