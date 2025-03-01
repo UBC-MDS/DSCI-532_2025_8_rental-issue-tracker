@@ -14,5 +14,6 @@ dependencies:
   - python=3.13.1
   - pandas=2.2.3
   - pyjanitor=0.30.0
+  - dash-leaflet=1.0.15
   - pip:
       - dash-vega-components==0.11.0
