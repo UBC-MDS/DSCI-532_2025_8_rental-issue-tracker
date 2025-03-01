@@ -12,5 +12,8 @@ dependencies:
   - lxml=5.3.1 # pd.read_html()
   - pip=25.0.1
   - python=3.13.1
+  - pandas=2.2.3
+  - pyjanitor=0.30.0
+  - dash-leaflet=1.0.15
   - pip:
-      - dash-vega-components
+      - dash-vega-components==0.11.0
