@@ -2,6 +2,21 @@
 
 The Rental Issue Tracker is a dashboard designed to help property managers and tenants track, manage, and analyze rental issues efficiently. This project is part of DSCI 532 (Data Visualization II) and aims to provide an interactive and intuitive interface for exploring reported rental issues.
 
+## Motivation
+
+### The problem
+
+- It’s challenging for newcomers, like international students or new investors—to make informed decisions about rental housing options and neighborhood safety in Vancouver.
+- Tenants, prospective renters, and investors lack easy access to data-driven insights that can help them identify trends, pinpoint high-risk properties, explore the connection between property violations and tax assessments, and estimate rental costs.
+
+### The solution
+
+The rental issue tracker app will:
+
+- Combine rental property by-law issues with property tax data from the Vancouver Open Data portal to help users identify trends, pinpoint high-risk properties, explore the connection between property violations and tax assessments, and estimate rental costs.
+- Feature an interactive map of Vancouver, allowing users to view brief information about rental properties.
+- Provide additional insights through statistical charts on the right, offering detailed analysis of rental issues by property type and local area, as well as the correlation between property values and the number of outstanding violations.
+
 ## Running app locally
 
 1. Ensure you have the `conda` installed and inside the root directory of the repository, execute the following command:
@@ -20,20 +35,9 @@ conda env create -f environment.yml
 - Check the statistical charts on the right side of the dashboard for detailed insights. View trends in rental issues, property values, and correlations between violations and tax assessments to make informed decisions.
 - Use the app to pinpoint high-risk properties, estimate rental costs, and identify safe, well-maintained neighborhoods—perfect for tenants, prospective renters, or investors.
 
-## Motivation
+## Demo
 
-### The problem
-
-- It’s challenging for newcomers, like international students or new investors—to make informed decisions about rental housing options and neighborhood safety in Vancouver.
-- Tenants, prospective renters, and investors lack easy access to data-driven insights that can help them identify trends, pinpoint high-risk properties, explore the connection between property violations and tax assessments, and estimate rental costs.
-
-### The solution
-
-The rental issue tracker app will:
-
-- Combine rental property by-law issues with property tax data from the Vancouver Open Data portal to help users identify trends, pinpoint high-risk properties, explore the connection between property violations and tax assessments, and estimate rental costs.
-- Feature an interactive map of Vancouver, allowing users to view brief information about rental properties.
-- Provide additional insights through statistical charts on the right, offering detailed analysis of rental issues by property type and local area, as well as the correlation between property values and the number of outstanding violations.
+![Demo](./img/demo.gif)
 
 ## Contributing
 
