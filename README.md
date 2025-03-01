@@ -2,6 +2,10 @@
 
 The Rental Issue Tracker is a dashboard designed to help property managers and tenants track, manage, and analyze rental issues efficiently. This project is part of DSCI 532 (Data Visualization II) and aims to provide an interactive and intuitive interface for exploring reported rental issues.
 
+## Viewing the latest dashboard
+
+Our latest dashboard can be viewed [here](https://dsci-532-2025-8-rental-issue-tracker.onrender.com).
+
 ## Running app
 
 1. Ensure you have the `conda` installed and inside the root directory of the repository, execute the following command:
