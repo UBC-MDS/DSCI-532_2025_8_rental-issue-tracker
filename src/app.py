@@ -43,6 +43,15 @@ geo_location_dict = {
     'West End':{'zoom':14.71,'center':[49.2853688,-123.1342539]}
 }
 
+neighborhoods = sorted(issues_values_joined['geo_local_area'].unique().tolist())
+neighborhood_color_range = [
+'#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+'#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+'#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5',
+'#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5',
+'#fd8b3c'  # Adding a 21st distinct color - orange-ish
+]
+
 def create_map_icon(row):
     '''
     Given a row from the dataframe, create an icon with tooltip info on map.
@@ -80,8 +89,11 @@ def create_map_icons(data):
     return data.apply(create_map_icon,axis=1).to_list()
 
 def create_pie_chart(data, selected_region):
+    """Creates a donut chart showing the distribution of rental issues by local area."""
 
-    base = alt.Chart(data, title='Number of Rental Issues').mark_arc().encode(
+    base = alt.Chart(data, title='Number of Rental Issues').mark_arc(
+        innerRadius=50   # You can also specify the outer radius
+    ).encode(
         theta=alt.Theta('total_outstanding', type='quantitative'),
         tooltip=['geo_local_area', 'total_outstanding'],
         order=alt.Order('total_outstanding:Q', sort='descending')
@@ -91,7 +103,10 @@ def create_pie_chart(data, selected_region):
         chart = base.encode(
             color=alt.condition(
                 alt.datum.geo_local_area == selected_region,
-                alt.Color('geo_local_area:N', title='Local Area'),
+                alt.Color('geo_local_area:N', title='Local Area', scale=alt.Scale(
+                    domain=neighborhoods,
+                    range=neighborhood_color_range
+                )),
                 alt.value('gray'),
             ),
             opacity=alt.condition(
@@ -103,12 +118,17 @@ def create_pie_chart(data, selected_region):
     else:
         # If no selected_location, use full color for all
         chart = base.encode(
-            color=alt.Color('geo_local_area:N', title='Local Area')
+            color=alt.Color('geo_local_area:N', title='Local Area', scale=alt.Scale(
+                    domain=neighborhoods,
+                    range=neighborhood_color_range
+                ))
         )
     return chart
 
 # Create horizontal bar chart function
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
+    """Create an interactive Altair bar chart with specified data, columns, and title."""
+
     if x_title is None:
         x_title = x_col
     if y_title is None:
@@ -132,6 +152,8 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
 
 # Create scatter plot
 def create_scatter_plot(data, x_col, y_col, tooltip, title, x_title=None, y_title=None):
+    """Create a scatter plot with regression line using Altair library for rental property data."""
+
     if x_title is None:
         x_title = x_col
     if y_title is None:
@@ -140,14 +162,23 @@ def create_scatter_plot(data, x_col, y_col, tooltip, title, x_title=None, y_titl
     points = alt.Chart(data).mark_point().encode(
         y=alt.Y(y_col, title=y_title),
         x=alt.X(x_col, title=x_title),
+        color=alt.Color('geo_local_area:N', title='Local Area', scale=alt.Scale(
+                    domain=neighborhoods,
+                    range=neighborhood_color_range
+                )),
         tooltip=[tooltip]
     )
 
-    fit_line = points.transform_regression(x_col, y_col).mark_line()
+    fit_line = alt.Chart(data).transform_regression(
+        x_col, y_col
+    ).mark_line(color='black').encode(
+        x=x_col,
+        y=y_col
+    )
 
     chart = (points + fit_line).properties(
         title=title
-    ).interactive()
+    )
 
     return chart
 
@@ -222,7 +253,10 @@ app.layout = html.Div([
     Input('zoning-dropdown','value')
 )
 def update_map(selected_region, selected_zone):    
+    """Updates the map view based on selected region and zone filters."""
+    # Function implementation...
     # Default center and zoom
+
     icon_data = issues_values_joined.copy()
     center = [49.272877, -123.078896]  # Default center
     zoom = 11.2  # Default zoom
@@ -250,6 +284,8 @@ def update_map(selected_region, selected_zone):
     Input('region-dropdown', 'value')
 )
 def update_pie_chart(selected_region):
+    """Updates and returns HTML of the pie chart based on the selected region."""
+    
     aggregated_property_values = issues.groupby('geo_local_area')['total_outstanding'].sum().reset_index()
     return create_pie_chart(aggregated_property_values, selected_region).to_html()
 
@@ -259,6 +295,8 @@ def update_pie_chart(selected_region):
     Input('region-dropdown', 'value')
 )
 def update_bar_chart(selected_region):
+    """Update bar chart displaying total outstanding issues by zoning classification for a selected region."""
+
     if selected_region:
         filtered_property_values = issues_values_joined[issues_values_joined['geo_local_area'] == selected_region]
         aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
@@ -281,6 +319,8 @@ def update_bar_chart(selected_region):
     Input('region-dropdown', 'value')
 )
 def update_scatter_plot(selected_region):
+    """Update the scatter plot based on the selected region."""
+
     if selected_region:
         filtered_property_values = property_values[property_values['geo_local_area'] == selected_region]
     else:
