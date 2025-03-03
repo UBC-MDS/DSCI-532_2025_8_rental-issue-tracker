@@ -14,12 +14,12 @@ issues_values_joined['zoning_classification'] = issues_values_joined['zoning_cla
 
 # dictionary that maps zoning classes to icon colors
 zone_icon_dict = {
-    'Commercial':('blue','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'),
-    'Historical Area':('red','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'),
-    'Industrial':('green','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png'),
-    'Residential':('yellow','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png'),
-    'Residential Inclusive':('purple','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png'),
-    'N/A':('grey','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png')
+    'Commercial':('#2A81CB','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'),
+    'Historical Area':('#CB2B3E','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'),
+    'Industrial':('#2AAD27','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png'),
+    'Residential':('#FFD326	','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png'),
+    'Residential Inclusive':('#9C2BCB','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png'),
+    'N/A':('#7B7B7B','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png')
 }
 
 # dictionary that gives locations of neighborhoods on map
@@ -115,12 +115,19 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
         y_title = y_col
 
     chart = alt.Chart(data).mark_bar().encode(
-        y=alt.Y(y_col, title=y_title),
-        x=alt.X(x_col, title=x_title),
-        tooltip=[y_col, x_col]
+        y=alt.Y(y_col, title=y_title).sort('-x'),
+        x=alt.X(x_col, title=x_title).axis(tickMinStep=1),
+        color=alt.Color(y_col)
+        .scale(
+            domain =list(zone_icon_dict.keys()),
+            range=[tup[0] for tup in zone_icon_dict.values()])
+        .legend(None),
+        tooltip=[
+            alt.Tooltip(x_col, title=x_title),
+            ]
     ).properties(
         title=title
-    ).interactive()
+    )
     return chart
 
 # Create scatter plot
@@ -163,21 +170,21 @@ app.layout = html.Div([
             center=[49.272877, -123.078896],
             zoom=11.2,
         ),
-        html.Label('Select a Region:'),
         dcc.Dropdown(
             id='region-dropdown',
             options=[
                 {'label': loc, 'value': loc} for loc in sorted(property_values['geo_local_area'].unique())
             ],
-            value=None
+            value=None,
+            placeholder='Select a Neighbourhood'
         ),
-        html.Label('Select a Building Type:'),
         dcc.Dropdown(
             id='zoning-dropdown',
             options=[
                 {'label': loc, 'value': loc} for loc in sorted(property_values['zoning_classification'].unique())
             ],
-            value=None
+            value=None,
+            placeholder='Select a Zoning Type'
         )
     ], style={'width': '50%', 'display': 'inline-block'}),
     
