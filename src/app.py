@@ -151,7 +151,7 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
     return chart
 
 # Create scatter plot
-def create_scatter_plot(data, x_col, y_col, tooltip, title, x_title=None, y_title=None):
+def create_scatter_plot(data, x_col, y_col, title, x_title=None, y_title=None):
     """Create a scatter plot with regression line using Altair library for rental property data."""
 
     if x_title is None:
@@ -159,14 +159,20 @@ def create_scatter_plot(data, x_col, y_col, tooltip, title, x_title=None, y_titl
     if y_title is None:
         y_title = y_col
     
-    points = alt.Chart(data).mark_point().encode(
-        y=alt.Y(y_col, title=y_title),
+    points = alt.Chart(data).mark_point(filled=True, opacity=0.7).encode(
+        y=alt.Y(y_col, title=y_title)
+                .axis(tickMinStep=1,format='d'),
         x=alt.X(x_col, title=x_title),
-        color=alt.Color('geo_local_area:N', title='Local Area', scale=alt.Scale(
+        color=alt.Color('geo_local_area:N') 
+                .scale(
                     domain=neighborhoods,
-                    range=neighborhood_color_range
-                )),
-        tooltip=[tooltip]
+                    range=neighborhood_color_range)
+                .legend(None),
+        size=alt.Size('total_units:Q',title='Number of Units'),
+        tooltip=[
+            alt.Tooltip('geo_local_area:N',title='Neighbourhood'),
+            alt.Tooltip('total_units:Q',title='Number of Units')
+            ]
     )
 
     fit_line = alt.Chart(data).transform_regression(
@@ -330,7 +336,6 @@ def update_scatter_plot(selected_region):
         data=filtered_property_values,
         x_col='current_land_value',
         y_col='total_outstanding',
-        tooltip='geo_local_area',
         title='Property Prices vs Outstanding Issues',
         x_title='Property Prices',
         y_title='Outstanding Issues'
