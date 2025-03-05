@@ -165,7 +165,8 @@ def create_scatter_plot(data, x_col, y_col, title, x_title=None, y_title=None):
     points = alt.Chart(data).mark_point(filled=True, opacity=0.7).encode(
         y=alt.Y(y_col, title=y_title)
                 .axis(tickMinStep=1,format='d'),
-        x=alt.X(x_col, title=x_title),
+        x=alt.X(x_col, title=x_title)
+                .axis(format='$,.0f'),
         color=alt.Color('geo_local_area:N') 
                 .scale(
                     domain=neighborhoods,
