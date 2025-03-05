@@ -129,14 +129,17 @@ def create_pie_chart(data, selected_region):
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
     """Create an interactive Altair bar chart with specified data, columns, and title."""
 
+    data = data.sort_values(by=x_col, ascending=True)
+
     if x_title is None:
         x_title = x_col
     if y_title is None:
         y_title = y_col
 
     chart = alt.Chart(data).mark_bar().encode(
+        x=alt.X(x_col, title=x_title,type='quantitative')
+            .axis(format='d'),
         y=alt.Y(y_col, title=y_title).sort('-x'),
-        x=alt.X(x_col, title=x_title).axis(tickMinStep=1),
         color=alt.Color(y_col)
         .scale(
             domain =list(zone_icon_dict.keys()),
