@@ -1,5 +1,5 @@
 import altair as alt
-from data.data import load_data, zone_icon_dict, neighborhoods, neighborhood_color_range
+from ..data.data import load_data, zone_icon_dict, neighborhoods, neighborhood_color_range
 
 issues_values_joined, property_values, issues = load_data()
 

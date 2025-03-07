@@ -1,7 +1,7 @@
 from dash.dependencies import Input, Output
 import dash_leaflet as dl
-from components.map import create_map_icons
-from data.data import geo_location_dict
+from ..components.map import create_map_icons
+from ..data.data import geo_location_dict
 
 def register_map_callbacks(app, issues_values_joined):
     # Callback for map

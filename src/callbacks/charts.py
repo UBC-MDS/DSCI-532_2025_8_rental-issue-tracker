@@ -1,6 +1,6 @@
 from dash.dependencies import Input, Output
 from altair import Chart
-from components.charts import create_pie_chart, create_bar_chart, create_scatter_plot
+from ..components.charts import create_pie_chart, create_bar_chart, create_scatter_plot
 
 def register_chart_callbacks(app, issues, issues_values_joined, property_values):
     # Callback for pie chart

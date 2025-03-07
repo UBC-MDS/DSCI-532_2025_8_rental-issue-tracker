@@ -1,8 +1,8 @@
 from dash import Dash, dcc, html
 import dash_leaflet as dl
-from data.data import load_data
-from callbacks.map import register_map_callbacks
-from callbacks.charts import register_chart_callbacks
+from .data.data import load_data
+from .callbacks.map import register_map_callbacks
+from .callbacks.charts import register_chart_callbacks
 
 # Load data
 issues_values_joined, property_values, issues = load_data()

@@ -1,6 +1,6 @@
 import dash_leaflet as dl
 import pandas as pd
-from data.data import load_data, zone_icon_dict
+from ..data.data import load_data, zone_icon_dict
 
 issues_values_joined, property_values, issues = load_data()
 
