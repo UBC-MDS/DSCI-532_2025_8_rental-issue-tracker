@@ -80,7 +80,7 @@ app.layout = dbc.Container([
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             )
 
-        ], width=8, style={'padding': '10px', 'backgroundColor': '#f0f8ff'}),
+        ], width=7, style={'padding': '10px', 'backgroundColor': '#f0f8ff'}),
 
         # Right Column
         dbc.Col([
