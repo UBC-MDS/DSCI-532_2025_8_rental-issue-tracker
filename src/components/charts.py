@@ -64,7 +64,8 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
             alt.Tooltip(x_col, title=x_title),
             ]
     ).properties(
-        title=title
+        title=title,
+        width=600
     )
     return chart
 
