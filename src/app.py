@@ -13,6 +13,7 @@ server = app.server
 
 # Layout
 app.layout = html.Div([
+
     # Title Section
     html.Div([
         html.H1("Vancouver Rental Issue Tracker Dashboard", 
