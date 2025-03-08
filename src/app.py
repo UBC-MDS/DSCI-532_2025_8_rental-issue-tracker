@@ -15,7 +15,7 @@ server = app.server
 app.layout = html.Div([
         # Add Title Section
     html.Div([
-        html.H1("Vancouver Property and Issues Dashboard", 
+        html.H1("Vancouver Rental Issue Tracker Dashboard", 
                 style={'textAlign': 'center', 'marginBottom': '20px'})
     ], style={'width': '100%', 'padding': '10px', 'backgroundColor': '#f9f9f9', 
               'margin': '0 auto'}),  
