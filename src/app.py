@@ -80,6 +80,25 @@ app.layout = html.Div([
             ], style={'border': '1px solid #ddd', 'padding': '10px'}) 
         ], style={'width': '35%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px', 'backgroundColor': '#fff8dc'}),
     ], style={'display': 'flex', 'justifyContent': 'flex-start', 'alignItems': 'flex-start', 'gap': '20px'}),
+    # Footer Section (Description)
+    html.Div([
+        html.P(
+            "This dashboard combines rental property by-law issues with property tax data from the Vancouver Open Data portal. "
+            "It helps users identify trends, pinpoint high-risk properties, explore the connection between property violations and tax assessments, "
+            "and estimate rental costs.",
+            style={'fontSize': '14px', 'marginBottom': '10px', 'color': '#333'}
+        ),
+        html.P(
+            "Developed by Group 8 | Last updated: 3/7/2025",
+            style={'fontSize': '12px', 'marginBottom': '10px', 'color': '#666'}
+        ),
+        html.A(
+            "View on GitHub",
+            href="https://github.com/UBC-MDS/DSCI-532_2025_8_rental-issue-tracker",
+            target="_blank",
+            style={'fontSize': '12px', 'color': '#007bff', 'textDecoration': 'underline'}
+        )
+    ], style={'width': '100%', 'padding': '10px', 'textAlign': 'center', 'backgroundColor': '#f9f9f9', 'marginTop': '20px'})
 ])
 
 # Register callbacks
