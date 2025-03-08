@@ -33,36 +33,53 @@ app.layout = dbc.Container([
             dbc.Card(
                 dl.Map(
                     id='city-map',
-                    style={'width': '100%', 'height': '500px'},
+                    style={'height': '400px'},
                     center=[49.272877, -123.078896],
                     zoom=11.2,
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             ),
 
-            dbc.Card(
-                dcc.Dropdown(
-                    id='region-dropdown',
-                    options=[
-                        {'label': loc, 'value': loc} for loc in sorted(property_values['geo_local_area'].unique())
-                    ],
-                    value=None,
-                    placeholder='Select a Neighbourhood'
+            dbc.Row([
+                dbc.Col(
+                    dbc.Card(
+                        dcc.Dropdown(
+                            id='region-dropdown',
+                            options=[
+                                {'label': loc, 'value': loc} for loc in sorted(property_values['geo_local_area'].unique())
+                            ],
+                            value=None,
+                            placeholder='Select a Neighbourhood'
+                        ),
+                    style={'height': '100%', 'border': '1px solid #ddd', 'padding': '10px'}
+                    ),
+                    width=6
                 ),
-                style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
-            ),
+
+                dbc.Col(
+                    dbc.Card(
+                        dcc.Dropdown(
+                            id='zoning-dropdown',
+                            options=[
+                            {'label': loc, 'value': loc} for loc in sorted(property_values['zoning_classification'].unique())
+                            ],
+                            value=None,
+                            placeholder='Select a Zoning Type'
+                        ),
+                    style={'height': '100%', 'border': '1px solid #ddd', 'padding': '10px'}
+                    ),
+                    width=6
+                ),
+            ], className="mb-3"),
 
             dbc.Card(
-                dcc.Dropdown(
-                    id='zoning-dropdown',
-                    options=[
-                        {'label': loc, 'value': loc} for loc in sorted(property_values['zoning_classification'].unique())
-                    ],
-                    value=None,
-                    placeholder='Select a Zoning Type'
+                html.Iframe(
+                    id='bar-chart',
+                    style={'width': '100%', 'height': '230px', 'border': 'none'}
                 ),
-                style={'border': '1px solid #ddd', 'padding': '10px'}
+                style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             )
+
         ], width=8, style={'padding': '10px', 'backgroundColor': '#f0f8ff'}),
 
         # Right Column
@@ -70,15 +87,7 @@ app.layout = dbc.Container([
             dbc.Card(
                 html.Iframe(
                     id='pie-chart',
-                    style={'width': '100%', 'height': '400px', 'border': 'none'}
-                ),
-                style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
-            ),
-
-            dbc.Card(
-                html.Iframe(
-                    id='bar-chart',
-                    style={'width': '100%', 'height': '300px', 'border': 'none'}
+                    style={'width': '100%', 'height': '350px', 'border': 'none'}
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             ),
@@ -86,11 +95,11 @@ app.layout = dbc.Container([
             dbc.Card(
                 html.Iframe(
                     id='scatter-plot',
-                    style={'width': '100%', 'height': '400px', 'border': 'none'}
+                    style={'width': '100%', 'height': '350px', 'border': 'none'}
                 ),
                 style={'border': '1px solid #ddd', 'padding': '10px'}
             )
-        ], width=4, style={'padding': '10px', 'backgroundColor': '#fff8dc'}),
+        ], style={'padding': '10px', 'backgroundColor': '#fff8dc'}),
     ]),
 
     # Footer Section (Description)
