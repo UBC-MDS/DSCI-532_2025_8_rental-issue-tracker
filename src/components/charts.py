@@ -70,7 +70,7 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
     return chart
 
 # Create scatter plot
-def create_scatter_plot(data, x_col, y_col, title, x_title=None, y_title=None):
+def create_scatter_plot(data, x_col, y_col, title,scale_type,x_title=None, y_title=None):
     """Create a scatter plot with regression line using Altair library for rental property data."""
 
     if x_title is None:
@@ -82,6 +82,7 @@ def create_scatter_plot(data, x_col, y_col, title, x_title=None, y_title=None):
         y=alt.Y(y_col, title=y_title)
                 .axis(tickMinStep=1,format='d'),
         x=alt.X(x_col, title=x_title)
+                .scale(type=scale_type)
                 .axis(format='$,.0f'),
         color=alt.Color('geo_local_area:N') 
                 .scale(
@@ -93,6 +94,9 @@ def create_scatter_plot(data, x_col, y_col, title, x_title=None, y_title=None):
             alt.Tooltip('geo_local_area:N',title='Neighbourhood'),
             alt.Tooltip('total_units:Q',title='Number of Units')
             ]
+    ).properties(
+        width=320,
+        height=200
     )
 
     fit_line = alt.Chart(data).transform_regression(
