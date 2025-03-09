@@ -6,8 +6,8 @@ issues_values_joined, property_values, issues = load_data()
 def create_pie_chart(data, selected_region):
     """Creates a donut chart showing the distribution of rental issues by local area."""
 
-    base = alt.Chart(data, title='Number of Rental Issues').mark_arc(
-        innerRadius=50   # You can also specify the outer radius
+    base = alt.Chart(data, title='Number of Rental Issues', height=250).mark_arc(
+        innerRadius=50,
     ).encode(
         theta=alt.Theta('total_outstanding', type='quantitative'),
         tooltip=['geo_local_area', 'total_outstanding'],
@@ -64,7 +64,8 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
             alt.Tooltip(x_col, title=x_title),
             ]
     ).properties(
-        title=title
+        title=title,
+        width=600
     )
     return chart
 
@@ -77,7 +78,7 @@ def create_scatter_plot(data, x_col, y_col, title, x_title=None, y_title=None):
     if y_title is None:
         y_title = y_col
     
-    points = alt.Chart(data).mark_point(filled=True, opacity=0.7).encode(
+    points = alt.Chart(data, height=250).mark_point(filled=True, opacity=0.7).encode(
         y=alt.Y(y_col, title=y_title)
                 .axis(tickMinStep=1,format='d'),
         x=alt.X(x_col, title=x_title)
