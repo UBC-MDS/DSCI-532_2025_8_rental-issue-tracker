@@ -93,12 +93,24 @@ app.layout = dbc.Container([
             ),
 
             dbc.Card(
-                html.Iframe(
+                dbc.CardBody([
+                    html.Iframe(
                     id='scatter-plot',
-                    style={'width': '100%', 'height': '350px', 'border': 'none'}
-                ),
+                    style={'width': '100%', 'height': '292px', 'border': 'none'}
+                    ),
+                dcc.RadioItems(
+                    id='scale-radio',
+                    options=[
+                    {'label': 'Linear', 'value': 'linear'},
+                    {'label': 'Logarithmic', 'value': 'log'},
+                    ],
+                    value='linear',
+                    inline=True,
+                    style={'display': 'flex', 'gap': '15px'}
+                    )   
+                ]),
                 style={'border': '1px solid #ddd', 'padding': '10px'}
-            )
+            ),
         ], style={'padding': '10px', 'backgroundColor': '#fff8dc'}),
     ]),
 

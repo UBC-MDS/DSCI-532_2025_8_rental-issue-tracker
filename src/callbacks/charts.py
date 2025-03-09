@@ -41,9 +41,10 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
     # Callback for scatter plot
     @app.callback(
         Output('scatter-plot', 'srcDoc'),
-        Input('region-dropdown', 'value')
+        Input('region-dropdown', 'value'),
+        Input('scale-radio','value')
     )
-    def update_scatter_plot(selected_region):
+    def update_scatter_plot(selected_region,selected_scale):
         """Update the scatter plot based on the selected region."""
 
         if selected_region:
@@ -56,7 +57,8 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
             x_col='current_land_value',
             y_col='total_outstanding',
             title='Property Prices vs Outstanding Issues',
+            scale_type=selected_scale,
             x_title='Property Prices',
-            y_title='Outstanding Issues'
+            y_title='Outstanding Issues',  
         )
         return chart.to_html()
