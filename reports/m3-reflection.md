@@ -20,6 +20,11 @@
 
 - Arranged the UI components using Dash Bootstrap Components (dbc) card components for a cleaner layout.
 
+## Improvements Not Implemented
+
+- The global gridding of property value and rental issues from the original sketch has not been implemented.
+Since this would take extensive time to implement and overlay onto our map, we do not plan on implementing this feature.
+
 ## Further Improvements
 
 - Since our current scope is limited to Vancouver, I suggest restricting the map to display only Vancouver and disabling the ability to zoom out to the entire world.
