@@ -1,7 +1,7 @@
 import altair as alt
 from ..data.data import load_data, zone_icon_dict, neighborhoods, neighborhood_color_range
 
-issues_values_joined, property_values, issues = load_data()
+issues_values_joined, property_values, issues,_ = load_data()
 
 def create_pie_chart(data, selected_region):
     """Creates a donut chart showing the distribution of rental issues by local area."""
