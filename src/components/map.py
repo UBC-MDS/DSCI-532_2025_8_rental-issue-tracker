@@ -1,6 +1,6 @@
 import dash_leaflet as dl
 import pandas as pd
-from ..data.data import load_data, zone_icon_dict
+from ..data.data import load_data, zone_icon_dict,style_dictionary
 
 issues_values_joined, property_values, issues,_ = load_data()
 
@@ -39,3 +39,12 @@ def create_map_icons(data):
     Return a list of map icons given data
     '''
     return data.apply(create_map_icon,axis=1).to_list()
+
+
+def get_geo_style(feature):
+    '''
+    Get styling for a given neighborhood border element, based on pie chart color mapping
+    '''
+    name = feature["properties"]['name']
+    return style_dictionary[name]
+   

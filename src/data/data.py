@@ -62,3 +62,16 @@ neighborhood_color_range = [
 
 # index to get boundary data for each region
 boundary_index = {entry['properties']['name']:i for i,entry in enumerate(area_boundaries['features'])}
+del boundary_index['Oakridge']
+
+# get style for each region
+style_dictionary = {}
+for i,neighborhood in enumerate(boundary_index.keys()):
+   color = neighborhood_color_range[neighborhoods.index(neighborhood)]
+   style_dictionary.update({
+       neighborhood:{
+        "fillColor": color,
+        "color": "black",
+        "weight": 2,  
+        "fillOpacity": 0.5}
+   })
