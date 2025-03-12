@@ -1,7 +1,7 @@
 from dash.dependencies import Input, Output
 import dash_leaflet as dl
-from ..components.map import create_map_icons
-from ..data.data import geo_location_dict
+from ..components.map import create_map_icons,get_geo_style
+from ..data.data import geo_location_dict,area_boundaries,style_dictionary,boundary_index
 
 def register_map_callbacks(app, issues_values_joined):
     # Callback for map
@@ -16,21 +16,34 @@ def register_map_callbacks(app, issues_values_joined):
         # Function implementation...
         # Default center and zoom
 
+        geo_data = area_boundaries.copy()
         icon_data = issues_values_joined.copy()
         center = [49.272877, -123.078896]  # Default center
         zoom = 11.2  # Default zoom
+        style = {
+        "fillColor": 'grey',
+        "color": "black",
+        "weight": 2,  
+        "fillOpacity": 0.2
+        } # default style
         
         # zoom to selected neighborhood
         if selected_region:
             center = geo_location_dict[selected_region]['center']
             zoom = geo_location_dict[selected_region]['zoom']
+            geo_data = area_boundaries['features'][boundary_index[selected_region]]
+            style = style_dictionary[selected_region]
         
         # Apply zoning filter
         if selected_zone:
             icon_data = icon_data[icon_data['zoning_classification'] == selected_zone]
         
         children = [
-            dl.TileLayer(),  
+            dl.TileLayer(), 
+            dl.GeoJSON(
+                data=geo_data,
+                style=style
+            ),
             *create_map_icons(icon_data)
         ]
         

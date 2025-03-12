@@ -1,4 +1,6 @@
 import pandas as pd
+import pickle as pckl
+import json
 
 def load_data():
     property_values = pd.read_csv('data/clean/rentals_with_property_value.csv', index_col=0)
@@ -10,9 +12,13 @@ def load_data():
         issues_values_joined['zoning_classification'].astype(str).replace("nan", "N/A")
     )
 
-    return issues_values_joined, property_values, issues
+    # load in area boundary data
+    with open('data/raw/local-area-boundary.geojson',encoding='utf-8-sig') as file:
+        area_boundaries = json.load(file)
 
-issues_values_joined, property_values, issues = load_data()
+    return issues_values_joined, property_values, issues, area_boundaries
+
+issues_values_joined, property_values, issues, area_boundaries = load_data()
 
 # dictionary that maps zoning classes to icon colors
 zone_icon_dict = {
@@ -53,3 +59,19 @@ neighborhood_color_range = [
 '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5',
 '#fd8b3c'  # Adding a 21st distinct color - orange-ish
 ]
+
+# index to get boundary data for each region
+boundary_index = {entry['properties']['name']:i for i,entry in enumerate(area_boundaries['features'])}
+del boundary_index['Oakridge']
+
+# get style for each region
+style_dictionary = {}
+for i,neighborhood in enumerate(boundary_index.keys()):
+   color = neighborhood_color_range[neighborhoods.index(neighborhood)]
+   style_dictionary.update({
+       neighborhood:{
+        "fillColor": color,
+        "color": "black",
+        "weight": 2,  
+        "fillOpacity": 0.5}
+   })
