@@ -47,5 +47,10 @@ def register_map_callbacks(app, issues_values_joined):
             *create_map_icons(icon_data)
         ]
         
+        if selected_zone and isinstance(selected_zone, str):
+            icon_data = icon_data[icon_data['zoning_classification'].str.contains(selected_zone, na=False)]
+        else:
+            icon_data = icon_data.copy()        
+
         # Return the updated center, zoom, and children (markers)
         return {'center':center, 'zoom':zoom,'transition':"flyTo"}, children

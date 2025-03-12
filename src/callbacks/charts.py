@@ -41,17 +41,22 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
     # New callback to update zoning dropdown
     @app.callback(
         Output('zoning-dropdown', 'value'),
-        Input('bar-chart', 'selection')
+        Input('bar-chart', 'signalData')
     )
-    def update_zoning_dropdown(selection):
-        print("Selection:", selection)
-        if selection and 'zoning_select' in selection:
-            zoning_data = selection['zoning_select']
-            if isinstance(zoning_data, list) and zoning_data:
-                return zoning_data[0]['zoning_classification']
-            elif isinstance(zoning_data, dict):
-                return zoning_data.get('zoning_classification')
+    def update_zoning_dropdown(signal_data):
+        print(f"[DEBUG] Raw signal data: {signal_data}")  
+        
+        if signal_data and 'zoning_select' in signal_data:
+
+            selected = signal_data['zoning_select'].get('zoning_classification')
+            
+            if isinstance(selected, list):
+                return selected[0] if selected else None
+            elif isinstance(selected, str):
+                return selected
+        
         return dash.no_update
+
     # Callback for scatter plot
     @app.callback(
         Output('scatter-plot', 'srcDoc'),

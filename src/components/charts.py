@@ -41,7 +41,6 @@ def create_pie_chart(data, selected_region):
     return chart
 
 # Create horizontal bar chart function
-
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
     # Sort data by x_col for consistent visualization
     data = data.sort_values(by=x_col, ascending=True)
@@ -53,15 +52,21 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
         y_title = y_col
     
     # Define a selection for interactivity
-    zoning_select = alt.selection_point(name='zoning_select', on='click', fields=[y_col])
+    zoning_select = alt.selection_point(
+        name='zoning_select',
+        fields=['zoning_classification'],
+        on='click[!event.shiftKey && !event.ctrlKey]',  
+        empty=False,  
+        toggle=False  
+    )
     
     # Create the bar chart with explicit type specifications
     chart = alt.Chart(data).mark_bar().encode(
         x=alt.X(x_col, title=x_title, type='quantitative').axis(format='d'),
-        y=alt.Y(y_col, title=y_title, type='nominal').sort('-x'),  # Specify type as 'nominal'
+        y=alt.Y(y_col, title=y_title, type='nominal').sort('-x'),  
         color=alt.condition(
             zoning_select,
-            alt.Color(y_col, type='nominal').scale(  # Specify type as 'nominal'
+            alt.Color(y_col, type='nominal').scale(  
                 domain=list(zone_icon_dict.keys()),
                 range=[tup[0] for tup in zone_icon_dict.values()]
             ).legend(None),
@@ -72,7 +77,6 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
         title=title,
         width=600
     )
-    
     # Return the chart specification as a dictionary
     return chart.to_dict()
 

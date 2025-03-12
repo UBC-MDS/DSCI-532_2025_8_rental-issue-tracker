@@ -88,7 +88,8 @@ app.layout = dbc.Container([
                 Vega(
                     id='bar-chart',
                     spec=initial_bar_spec,
-                    style={'width': '100%', 'height': '230px'}
+                    style={'width': '100%', 'height': '230px'},
+                    signalsToObserve=["zoning_select"]
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             )
