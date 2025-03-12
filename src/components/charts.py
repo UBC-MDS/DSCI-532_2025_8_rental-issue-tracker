@@ -41,35 +41,42 @@ def create_pie_chart(data, selected_region):
     return chart
 
 # Create horizontal bar chart function
+
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
-    """Create an interactive Altair bar chart with specified data, columns, and title."""
-
+    # Sort data by x_col for consistent visualization
     data = data.sort_values(by=x_col, ascending=True)
-
+    
+    # Set default titles if not provided
     if x_title is None:
         x_title = x_col
     if y_title is None:
         y_title = y_col
-
+    
+    # Define a selection for interactivity
+    zoning_select = alt.selection_point(name='zoning_select', on='click', fields=[y_col])
+    
+    # Create the bar chart with explicit type specifications
     chart = alt.Chart(data).mark_bar().encode(
-        x=alt.X(x_col, title=x_title,type='quantitative')
-            .axis(format='d'),
-        y=alt.Y(y_col, title=y_title).sort('-x'),
-        color=alt.Color(y_col)
-        .scale(
-            domain =list(zone_icon_dict.keys()),
-            range=[tup[0] for tup in zone_icon_dict.values()])
-        .legend(None),
-        tooltip=[
-            alt.Tooltip(x_col, title=x_title),
-            ]
-    ).properties(
+        x=alt.X(x_col, title=x_title, type='quantitative').axis(format='d'),
+        y=alt.Y(y_col, title=y_title, type='nominal').sort('-x'),  # Specify type as 'nominal'
+        color=alt.condition(
+            zoning_select,
+            alt.Color(y_col, type='nominal').scale(  # Specify type as 'nominal'
+                domain=list(zone_icon_dict.keys()),
+                range=[tup[0] for tup in zone_icon_dict.values()]
+            ).legend(None),
+            alt.value('lightgray')
+        ),
+        tooltip=[alt.Tooltip(x_col, title=x_title)]
+    ).add_params(zoning_select).properties(
         title=title,
         width=600
     )
-    return chart
+    
+    # Return the chart specification as a dictionary
+    return chart.to_dict()
 
-# Create scatter plot
+    # Create scatter plot
 def create_scatter_plot(data, x_col, y_col, title,scale_type,x_title=None, y_title=None):
     """Create a scatter plot with regression line using Altair library for rental property data."""
 

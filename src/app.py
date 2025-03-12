@@ -1,9 +1,11 @@
 from dash import Dash, dcc, html
 import dash_leaflet as dl
 import dash_bootstrap_components as dbc
+from dash_vega_components import Vega
 from .data.data import load_data
 from .callbacks.map import register_map_callbacks
 from .callbacks.charts import register_chart_callbacks
+from .components.charts import create_bar_chart
 
 # Load data
 issues_values_joined, property_values, issues, area_boundaries = load_data()
@@ -11,6 +13,16 @@ issues_values_joined, property_values, issues, area_boundaries = load_data()
 # Initialize the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
+
+# Create initial bar chart specification
+initial_bar_spec = create_bar_chart(
+    data=issues_values_joined.groupby('zoning_classification')['total_outstanding'].sum().reset_index(),
+    x_col='total_outstanding',
+    y_col='zoning_classification',
+    title='Total Outstanding Issues by Zoning Classification',
+    x_title='Total Outstanding Issues',
+    y_title='Zoning Classification'
+)
 
 # Layout
 app.layout = dbc.Container([
@@ -73,9 +85,10 @@ app.layout = dbc.Container([
             ], className="mb-3"),
 
             dbc.Card(
-                html.Iframe(
+                Vega(
                     id='bar-chart',
-                    style={'width': '100%', 'height': '230px', 'border': 'none'}
+                    spec=initial_bar_spec,
+                    style={'width': '100%', 'height': '230px'}
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             )
