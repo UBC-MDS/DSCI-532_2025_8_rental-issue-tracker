@@ -56,7 +56,7 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
         name='zoning_select',
         fields=['zoning_classification'],
         on='click[!event.shiftKey && !event.ctrlKey]',  
-        empty=False,  
+        empty=True,  
         toggle=False  
     )
     
