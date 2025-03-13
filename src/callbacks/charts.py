@@ -15,18 +15,26 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
         aggregated_property_values = issues.groupby('geo_local_area')['total_outstanding'].sum().reset_index()
         return create_pie_chart(aggregated_property_values, selected_region).to_html()
 
-# Updated callback for bar chart
+    # Updated callback for bar chart
     @app.callback(
         Output('bar-chart', 'spec'),  # Output to the spec property of VegaLite
-        Input('region-dropdown', 'value')
+        Input('region-dropdown', 'value'),
+        Input('zoning-dropdown', 'value')  # Add zoning-dropdown as an input
     )
-    def update_bar_chart(selected_region):
+    def update_bar_chart(selected_region, selected_zone):
         """Update bar chart spec displaying total outstanding issues by zoning classification."""
         if selected_region:
             filtered_property_values = issues_values_joined[issues_values_joined['geo_local_area'] == selected_region]
+        else:
+            filtered_property_values = issues_values_joined
+
+        # If zoning dropdown is cleared (None), show all bars
+        if selected_zone is None or selected_zone == "":
             aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
         else:
-            aggregated_property_values = issues_values_joined.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+            aggregated_property_values = filtered_property_values[
+                filtered_property_values['zoning_classification'] == selected_zone
+            ].groupby('zoning_classification')['total_outstanding'].sum().reset_index()
 
         spec = create_bar_chart(
             data=aggregated_property_values,
@@ -47,7 +55,6 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
         print(f"[DEBUG] Raw signal data: {signal_data}")  
         
         if signal_data and 'zoning_select' in signal_data:
-
             selected = signal_data['zoning_select'].get('zoning_classification')
             
             if isinstance(selected, list):
