@@ -1,8 +1,8 @@
 import dash_leaflet as dl
 import pandas as pd
-from ..data.data import load_data, zone_icon_dict,style_dictionary
+from ..data.data import load_data, zone_icon_dict
 
-issues_values_joined, property_values, issues,_ = load_data()
+issues_values_joined, property_values, issues, area_boundaries, neighborhoods, boundary_index, style_dictionary = load_data()
 
 def create_map_icon(row):
     '''

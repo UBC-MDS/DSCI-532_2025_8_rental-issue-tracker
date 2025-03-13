@@ -1,26 +1,71 @@
 import pandas as pd
 import pickle as pckl
-import json
+import functools
 
-def load_data():
-    property_values = pd.read_csv('data/clean/rentals_with_property_value.csv', index_col=0)
-    issues = pd.read_csv('data/clean/rental_issues_clean.csv', index_col=0)
-    
-    # left join two dataframes above
+def process_and_save_data():
+    # Load data
+    property_values = pd.read_parquet('data/clean/rentals_with_property_value.parquet')
+    issues = pd.read_parquet('data/clean/rental_issues_clean.parquet')
+
+    # Process the data
     issues_values_joined = pd.merge(issues, property_values, how='left').drop_duplicates(subset=['lat', 'long'])
     issues_values_joined['zoning_classification'] = (
         issues_values_joined['zoning_classification'].astype(str).replace("nan", "N/A")
     )
 
-    # load in area boundary data
-    with open('data/raw/local-area-boundary.geojson',encoding='utf-8-sig') as file:
-        area_boundaries = json.load(file)
+    # Load and process boundary data
+    with open('data/raw/local-area-boundary.pkl', 'rb') as file:
+        area_boundaries = pckl.load(file)
 
-    return issues_values_joined, property_values, issues, area_boundaries
+    # Get sorted neighborhoods
+    neighborhoods = sorted(issues_values_joined['geo_local_area'].unique().tolist())
 
-issues_values_joined, property_values, issues, area_boundaries = load_data()
+    # Create boundary index
+    boundary_index = {entry['properties']['name']:i for i,entry in enumerate(area_boundaries['features'])}
+    del boundary_index['Oakridge']
 
-# dictionary that maps zoning classes to icon colors
+    # Create style dictionary
+    style_dictionary = {}
+    for neighborhood in boundary_index.keys():
+        color = neighborhood_color_range[neighborhoods.index(neighborhood)]
+        style_dictionary.update({
+            neighborhood:{
+                "fillColor": color,
+                "color": "black",
+                "weight": 2,  
+                "fillOpacity": 0.5
+            }
+        })
+
+    # Save processed data
+    processed_data = {
+        'issues_values_joined': issues_values_joined,
+        'property_values': property_values,
+        'issues': issues,
+        'area_boundaries': area_boundaries,
+        'neighborhoods': neighborhoods,
+        'boundary_index': boundary_index,
+        'style_dictionary': style_dictionary
+    }
+    
+    with open('data/processed/processed_data.pkl', 'wb') as f:
+        pckl.dump(processed_data, f)
+
+@functools.lru_cache()
+def load_data():
+    with open('data/processed/processed_data.pkl', 'rb') as f:
+        data = pckl.load(f)
+    return (
+        data['issues_values_joined'],
+        data['property_values'],
+        data['issues'],
+        data['area_boundaries'],
+        data['neighborhoods'],
+        data['boundary_index'],
+        data['style_dictionary']
+    )
+
+# Constants
 zone_icon_dict = {
     'Commercial':('#2A81CB','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'),
     'Historical Area':('#CB2B3E','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'),
@@ -30,7 +75,6 @@ zone_icon_dict = {
     'N/A':('#7B7B7B','https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png')
 }
 
-# dictionary that gives locations of neighborhoods on map
 geo_location_dict = {
     'Arbutus Ridge':{'zoom':14.17,'center':[49.2467288,-123.1594228]},
     'Downtown':{'zoom':14.54,'center':[49.2790925,-123.1147099]},
@@ -51,27 +95,13 @@ geo_location_dict = {
     'West End':{'zoom':14.71,'center':[49.2853688,-123.1342539]}
 }
 
-neighborhoods = sorted(issues_values_joined['geo_local_area'].unique().tolist())
 neighborhood_color_range = [
-'#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-'#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
-'#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5',
-'#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5',
-'#fd8b3c'  # Adding a 21st distinct color - orange-ish
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+    '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5',
+    '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5',
+    '#fd8b3c'
 ]
 
-# index to get boundary data for each region
-boundary_index = {entry['properties']['name']:i for i,entry in enumerate(area_boundaries['features'])}
-del boundary_index['Oakridge']
-
-# get style for each region
-style_dictionary = {}
-for i,neighborhood in enumerate(boundary_index.keys()):
-   color = neighborhood_color_range[neighborhoods.index(neighborhood)]
-   style_dictionary.update({
-       neighborhood:{
-        "fillColor": color,
-        "color": "black",
-        "weight": 2,  
-        "fillOpacity": 0.5}
-   })
+# Run only once
+# process_and_save_data()

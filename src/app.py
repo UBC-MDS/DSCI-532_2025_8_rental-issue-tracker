@@ -6,7 +6,7 @@ from .callbacks.map import register_map_callbacks
 from .callbacks.charts import register_chart_callbacks
 
 # Load data
-issues_values_joined, property_values, issues, area_boundaries = load_data()
+issues_values_joined, property_values, issues, area_boundaries, neighborhoods, boundary_index, style_dictionary = load_data()
 
 # Initialize the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
