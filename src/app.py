@@ -62,8 +62,9 @@ app.layout = dbc.Container([
                     dbc.Card(
                         dcc.Dropdown(
                             id='zoning-dropdown',
+                            clearable=True,
                             options=[
-                            {'label': loc, 'value': loc} for loc in sorted(property_values['zoning_classification'].unique())
+                            {'label': loc, 'value': loc} for loc in sorted(issues_values_joined['zoning_classification'].unique())
                             ],
                             value=None,
                             placeholder='Select a Zoning Type'
