@@ -1,5 +1,6 @@
 from dash.dependencies import Input, Output
 from altair import Chart
+from dash import dash
 from ..components.charts import create_pie_chart, create_bar_chart, create_scatter_plot
 
 def register_chart_callbacks(app, issues, issues_values_joined, property_values):
@@ -14,21 +15,28 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
         aggregated_property_values = issues.groupby('geo_local_area')['total_outstanding'].sum().reset_index()
         return create_pie_chart(aggregated_property_values, selected_region).to_html()
 
-    # Callback for bar chart (Global view)
+    # Updated callback for bar chart
     @app.callback(
-        Output('bar-chart', 'srcDoc'),
-        Input('region-dropdown', 'value')
+        Output('bar-chart', 'spec'),  # Output to the spec property of VegaLite
+        Input('region-dropdown', 'value'),
+        Input('zoning-dropdown', 'value')  # Add zoning-dropdown as an input
     )
-    def update_bar_chart(selected_region):
-        """Update bar chart displaying total outstanding issues by zoning classification for a selected region."""
-
+    def update_bar_chart(selected_region, selected_zone):
+        """Update bar chart spec displaying total outstanding issues by zoning classification."""
         if selected_region:
             filtered_property_values = issues_values_joined[issues_values_joined['geo_local_area'] == selected_region]
+        else:
+            filtered_property_values = issues_values_joined
+
+        # If zoning dropdown is cleared (None), show all bars
+        if selected_zone is None or selected_zone == "":
             aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
         else:
-            aggregated_property_values = issues_values_joined.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+            aggregated_property_values = filtered_property_values[
+                filtered_property_values['zoning_classification'] == selected_zone
+            ].groupby('zoning_classification')['total_outstanding'].sum().reset_index()
 
-        chart = create_bar_chart(
+        spec = create_bar_chart(
             data=aggregated_property_values,
             x_col='total_outstanding',
             y_col='zoning_classification',
@@ -36,7 +44,25 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
             x_title='Total Outstanding Issues',
             y_title='Zoning Classification'
         )
-        return chart.to_html()
+        return spec
+
+    # New callback to update zoning dropdown
+    @app.callback(
+        Output('zoning-dropdown', 'value'),
+        Input('bar-chart', 'signalData')
+    )
+    def update_zoning_dropdown(signal_data):
+        print(f"[DEBUG] Raw signal data: {signal_data}")  
+        
+        if signal_data and 'zoning_select' in signal_data:
+            selected = signal_data['zoning_select'].get('zoning_classification')
+            
+            if isinstance(selected, list):
+                return selected[0] if selected else None
+            elif isinstance(selected, str):
+                return selected
+        
+        return dash.no_update
 
     # Callback for scatter plot
     @app.callback(

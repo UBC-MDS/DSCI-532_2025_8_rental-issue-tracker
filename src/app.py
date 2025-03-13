@@ -1,9 +1,11 @@
 from dash import Dash, dcc, html
 import dash_leaflet as dl
 import dash_bootstrap_components as dbc
+from dash_vega_components import Vega
 from .data.data import load_data
 from .callbacks.map import register_map_callbacks
 from .callbacks.charts import register_chart_callbacks
+from .components.charts import create_bar_chart
 
 # Load data
 issues_values_joined, property_values, issues, area_boundaries = load_data()
@@ -73,9 +75,10 @@ app.layout = dbc.Container([
             ], className="mb-3"),
 
             dbc.Card(
-                html.Iframe(
+                Vega(
                     id='bar-chart',
-                    style={'width': '100%', 'height': '230px', 'border': 'none'}
+                    style={'width': '100%', 'height': '230px'},
+                    signalsToObserve=["zoning_select"]
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             )
