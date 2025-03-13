@@ -8,7 +8,7 @@ from .callbacks.charts import register_chart_callbacks
 from .components.charts import create_bar_chart
 
 # Load data
-issues_values_joined, property_values, issues, area_boundaries = load_data()
+issues_values_joined, property_values, issues, area_boundaries, neighborhoods, boundary_index, style_dictionary = load_data()
 
 # Initialize the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
