@@ -14,16 +14,6 @@ issues_values_joined, property_values, issues, area_boundaries = load_data()
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-# Create initial bar chart specification
-initial_bar_spec = create_bar_chart(
-    data=issues_values_joined.groupby('zoning_classification')['total_outstanding'].sum().reset_index(),
-    x_col='total_outstanding',
-    y_col='zoning_classification',
-    title='Total Outstanding Issues by Zoning Classification',
-    x_title='Total Outstanding Issues',
-    y_title='Zoning Classification'
-)
-
 # Layout
 app.layout = dbc.Container([
 
@@ -87,7 +77,6 @@ app.layout = dbc.Container([
             dbc.Card(
                 Vega(
                     id='bar-chart',
-                    spec=initial_bar_spec,
                     style={'width': '100%', 'height': '230px'},
                     signalsToObserve=["zoning_select"]
                 ),
