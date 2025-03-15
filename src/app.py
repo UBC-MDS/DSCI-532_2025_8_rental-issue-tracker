@@ -5,7 +5,6 @@ from dash_vega_components import Vega
 from .data.data import load_data
 from .callbacks.map import register_map_callbacks
 from .callbacks.charts import register_chart_callbacks
-from .components.charts import create_bar_chart
 
 # Load data
 issues_values_joined, property_values, issues, area_boundaries, neighborhoods, boundary_index, style_dictionary = load_data()
@@ -89,9 +88,10 @@ app.layout = dbc.Container([
         # Right Column
         dbc.Col([
             dbc.Card(
-                html.Iframe(
+                Vega(
                     id='pie-chart',
-                    style={'width': '100%', 'height': '350px', 'border': 'none'}
+                    style={'width': '100%', 'height': '350px', 'border': 'none'},
+                    signalsToObserve=["region_select"]
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             ),

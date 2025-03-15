@@ -6,14 +6,14 @@ from ..components.charts import create_pie_chart, create_bar_chart, create_scatt
 def register_chart_callbacks(app, issues, issues_values_joined, property_values):
     # Callback for pie chart
     @app.callback(
-        Output('pie-chart', 'srcDoc'),
+        Output('pie-chart', 'spec'),
         Input('region-dropdown', 'value')
     )
     def update_pie_chart(selected_region):
         """Updates and returns HTML of the pie chart based on the selected region."""
         
         aggregated_property_values = issues.groupby('geo_local_area')['total_outstanding'].sum().reset_index()
-        return create_pie_chart(aggregated_property_values, selected_region).to_html()
+        return create_pie_chart(aggregated_property_values, selected_region)
 
     # Updated callback for bar chart
     @app.callback(
@@ -49,21 +49,42 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
     # New callback to update zoning dropdown
     @app.callback(
         Output('zoning-dropdown', 'value'),
-        Input('bar-chart', 'signalData')
+        Output('region-dropdown', 'value'),
+        Input('pie-chart', 'signalData'),
+        Input('bar-chart', 'signalData'),
+        prevent_initial_call=True
     )
-    def update_zoning_dropdown(signal_data):
-        print(f"[DEBUG] Raw signal data: {signal_data}")  
+    def update_dropdown(pie_signal_data, bar_signal_data):
+        print(f"[DEBUG] Pie chart signal data: {pie_signal_data}")
+        print(f"[DEBUG] Bar chart signal data: {bar_signal_data}")
         
-        if signal_data and 'zoning_select' in signal_data:
-            selected = signal_data['zoning_select'].get('zoning_classification')
+        # Initialize with no_update for both outputs
+        zoning_value = dash.no_update
+        region_value = dash.no_update
+        
+        # Check bar chart signals for zoning selection
+        if bar_signal_data and 'zoning_select' in bar_signal_data:
+            selected = bar_signal_data['zoning_select'].get('zoning_classification')
             
             if isinstance(selected, list):
-                return selected[0] if selected else None
+                zoning_value = selected[0] if selected else None
             elif isinstance(selected, str):
-                return selected
+                zoning_value = selected
         
-        return dash.no_update
-
+        # Check pie chart signals for region selection
+        if pie_signal_data and 'region_select' in pie_signal_data:
+            selected = pie_signal_data['region_select'].get('geo_local_area')
+            
+            if isinstance(selected, list):
+                region_value = selected[0] if selected else None
+            elif isinstance(selected, str):
+                region_value = selected
+        
+        
+        # Return a tuple with values for both outputs
+        return zoning_value, region_value
+    
+    
     # Callback for scatter plot
     @app.callback(
         Output('scatter-plot', 'srcDoc'),
