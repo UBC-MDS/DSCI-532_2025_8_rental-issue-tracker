@@ -17,6 +17,26 @@ The rental issue tracker app will:
 - Feature an interactive map of Vancouver, allowing users to view brief information about rental properties.
 - Provide additional insights through statistical charts on the right, offering detailed analysis of rental issues by property type and local area, as well as the correlation between property values and the number of outstanding violations.
 
+## Data Description
+
+The dashboard utilizes two primary datasets from the Vancouver Open Data portal:
+
+### Property Tax Report
+This dataset contains property assessment values and zoning information for Vancouver properties:
+- Property identifiers and address details
+- Current land and improvement values
+- Property tax information
+- Construction and renovation years
+- Zoning classification
+
+### Rental Standards - Current Issues
+This dataset tracks unresolved rental issues in multi-unit buildings (5+ units):
+- Property management information (business operator)
+- Property location (address, neighborhood)
+- Number of unresolved issues
+- Total rental units per property
+- Geolocation data
+
 ## Running app locally
 
 1. Ensure you have the `conda` installed and inside the root directory of the repository, execute the following command:
