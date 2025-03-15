@@ -1,4 +1,5 @@
 from dash.dependencies import Input, Output
+from ..common.extensions import cache
 import dash_leaflet as dl
 from ..components.map import create_map_icons,get_geo_style
 from ..data.data import load_data, geo_location_dict
@@ -11,13 +12,14 @@ def register_map_callbacks(app, issues_values_joined):
         Output('city-map', 'viewport'),
         Output('city-map', 'children'),
         Input('region-dropdown', 'value'),
-        Input('zoning-dropdown','value')
+        Input('zoning-dropdown','value'),
+        Input('na-button','n_clicks')
     )
-    def update_map(selected_region, selected_zone):    
+    @cache.memoize()
+    def update_map(selected_region, selected_zone,n_clicks):    
         """Updates the map view based on selected region and zone filters."""
         # Function implementation...
         # Default center and zoom
-
         geo_data = area_boundaries.copy()
         icon_data = issues_values_joined.copy()
         center = [49.252548, -123.100777]  # Default center
@@ -28,6 +30,11 @@ def register_map_callbacks(app, issues_values_joined):
         "weight": 2,  
         "fillOpacity": 0.2
         } # default style
+        remove_na = bool(n_clicks % 2)
+        
+        # remove N/A values if button clicked
+        if remove_na:
+            icon_data = icon_data[~icon_data['zoning_classification'].str.contains('N/A')]
         
         # zoom to selected neighborhood
         if selected_region:
