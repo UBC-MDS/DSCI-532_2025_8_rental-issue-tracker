@@ -71,7 +71,7 @@ def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
     
     # Create the bar chart with explicit type specifications
     chart = alt.Chart(data).mark_bar().encode(
-        x=alt.X(x_col, title=x_title, type='quantitative').axis(format='d'),
+        x=alt.X(x_col, title=x_title, type='quantitative'),
         y=alt.Y(y_col, title=y_title, type='nominal').sort('-x'),  
         color=alt.condition(
             zoning_select,
@@ -103,7 +103,7 @@ def create_scatter_plot(data, x_col, y_col, title,scale_type,x_title=None, y_tit
                 .axis(tickMinStep=1,format='d'),
         x=alt.X(x_col, title=x_title)
                 .scale(type=scale_type)
-                .axis(format='$,.0f'),
+                .axis(format='$~s'),  # Use ~s for abbreviated SI units (K, M)
         color=alt.Color('geo_local_area:N') 
                 .scale(
                     domain=neighborhoods,
@@ -112,7 +112,8 @@ def create_scatter_plot(data, x_col, y_col, title,scale_type,x_title=None, y_tit
         size=alt.Size('total_units:Q',title='Number of Units'),
         tooltip=[
             alt.Tooltip('geo_local_area:N',title='Neighbourhood'),
-            alt.Tooltip('total_units:Q',title='Number of Units')
+            alt.Tooltip('total_units:Q',title='Number of Units'),
+            alt.Tooltip(x_col, title=x_title, format='$,.0f')  # Keep full precision in tooltip
             ]
     ).properties(
         width=320,
