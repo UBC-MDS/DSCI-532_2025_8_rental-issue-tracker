@@ -109,3 +109,15 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
             y_title='Outstanding Issues',  
         )
         return chart.to_html()
+    
+    # callback for toggle button
+    @app.callback(
+        Output('na-button',"color"),
+        Input("na-button", "n_clicks"),
+        prevent_initial_call=True
+    )
+    def toggle_button(n_clicks):
+        if n_clicks % 2 == 1:
+            return "success"
+        else:
+            return "secondary"

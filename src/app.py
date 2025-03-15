@@ -5,13 +5,23 @@ from dash_vega_components import Vega
 from .data.data import load_data
 from .callbacks.map import register_map_callbacks
 from .callbacks.charts import register_chart_callbacks
+from .common.extensions import cache
+
+# Initialize app
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
+
+# Initialize cache
+cache.init_app(
+    app.server,
+    config={
+        'CACHE_TYPE': 'filesystem',
+        'CACHE_DIR': 'tmp'
+    }
+)
 
 # Load data
 issues_values_joined, property_values, issues, area_boundaries, neighborhoods, boundary_index, style_dictionary = load_data()
-
-# Initialize the app
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-server = app.server
 
 # Layout
 app.layout = dbc.Container([
@@ -56,7 +66,7 @@ app.layout = dbc.Container([
                         ),
                     style={'height': '100%', 'border': '1px solid #ddd', 'padding': '10px'}
                     ),
-                    width=6
+                    width=5
                 ),
 
                 dbc.Col(
@@ -72,8 +82,19 @@ app.layout = dbc.Container([
                         ),
                     style={'height': '100%', 'border': '1px solid #ddd', 'padding': '10px'}
                     ),
-                    width=6
+                    width=5
                 ),
+                
+                dbc.Col(
+                    dbc.Card(
+                        dbc.Button(
+                            "Remove N/A", id="na-button", color="secondary", 
+                            className="me-2",n_clicks=0
+                        ),
+                    style={'height': '100%', 'border': '1px solid #ddd', 'padding': '10px'}
+                    ),
+                    width=2
+                )
             ], className="mb-3"),
 
             dbc.Card(
