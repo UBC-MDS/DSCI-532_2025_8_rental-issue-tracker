@@ -38,7 +38,7 @@ app.layout = dbc.Container([
                     center=[49.272877, -123.078896],
                     zoom=11.2,
                     minZoom=11.6,
-                    maxBounds=[[49.163253, -123.412032], [49.328799, -122.845967]] 
+                    maxBounds=[[49.163253, -123.412032], [49.328799, -122.845967]]
                 ),
                 style={'marginBottom': '10px', 'border': '1px solid #ddd', 'padding': '10px'}
             ),
