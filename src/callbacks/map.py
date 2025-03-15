@@ -20,8 +20,8 @@ def register_map_callbacks(app, issues_values_joined):
 
         geo_data = area_boundaries.copy()
         icon_data = issues_values_joined.copy()
-        center = [49.272877, -123.078896]  # Default center
-        zoom = 11.2  # Default zoom
+        center = [49.252548, -123.100777]  # Default center
+        zoom = 11.6  # Default zoom
         style = {
         "fillColor": 'grey',
         "color": "black",
