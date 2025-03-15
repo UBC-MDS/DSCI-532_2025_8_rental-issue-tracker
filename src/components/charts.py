@@ -103,7 +103,7 @@ def create_scatter_plot(data, x_col, y_col, title,scale_type,x_title=None, y_tit
                 .axis(tickMinStep=1,format='d'),
         x=alt.X(x_col, title=x_title)
                 .scale(type=scale_type)
-                .axis(format='$~s'),  # Use ~s for abbreviated SI units (K, M)
+                .axis(format='$~s', labelAngle=45),  # Angled labels for better readability
         color=alt.Color('geo_local_area:N') 
                 .scale(
                     domain=neighborhoods,
