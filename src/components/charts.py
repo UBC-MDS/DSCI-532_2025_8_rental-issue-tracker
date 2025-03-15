@@ -10,15 +10,26 @@ def create_pie_chart(data, selected_region):
         innerRadius=50,
     ).encode(
         theta=alt.Theta('total_outstanding', type='quantitative'),
-        tooltip=['geo_local_area', 'total_outstanding'],
+        tooltip=[
+            alt.Tooltip('geo_local_area', title='Neighborhood'),
+            alt.Tooltip('total_outstanding', title='Outstanding Issues')
+        ],
         order=alt.Order('total_outstanding:Q', sort='descending')
+    )
+
+    region_select = alt.selection_point(
+        name='region_select',
+        fields=['geo_local_area'],
+        on='click[!event.shiftKey && !event.ctrlKey]',  
+        empty=True,  
+        toggle=False  
     )
 
     if selected_region is not None:
         chart = base.encode(
             color=alt.condition(
                 alt.datum.geo_local_area == selected_region,
-                alt.Color('geo_local_area:N', title='Local Area', scale=alt.Scale(
+                alt.Color('geo_local_area:N', title='Neighbourhood', scale=alt.Scale(
                     domain=neighborhoods,
                     range=neighborhood_color_range
                 )),
@@ -33,12 +44,14 @@ def create_pie_chart(data, selected_region):
     else:
         # If no selected_location, use full color for all
         chart = base.encode(
-            color=alt.Color('geo_local_area:N', title='Local Area', scale=alt.Scale(
+            color=alt.Color('geo_local_area:N', title='Neighbourhood', scale=alt.Scale(
                     domain=neighborhoods,
                     range=neighborhood_color_range
                 ))
         )
-    return chart
+
+    chart = chart.add_params(region_select)
+    return chart.to_dict()
 
 # Create horizontal bar chart function
 def create_bar_chart(data, x_col, y_col, title, x_title=None, y_title=None):
