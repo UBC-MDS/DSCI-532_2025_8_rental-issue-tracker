@@ -27,14 +27,10 @@ def create_pie_chart(data, selected_region):
 
     if selected_region is not None:
         chart = base.encode(
-            color=alt.condition(
-                alt.datum.geo_local_area == selected_region,
-                alt.Color('geo_local_area:N', title='Neighbourhood', scale=alt.Scale(
-                    domain=neighborhoods,
-                    range=neighborhood_color_range
-                )),
-                alt.value('gray'),
-            ),
+            color=alt.Color('geo_local_area:N', title='Neighbourhood', scale=alt.Scale(
+                domain=neighborhoods,
+                range=neighborhood_color_range
+            )),
             opacity=alt.condition(
                 alt.datum.geo_local_area == selected_region,
                 alt.value(1.0),
