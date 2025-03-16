@@ -47,14 +47,24 @@ def register_map_callbacks(app, issues_values_joined):
         if selected_zone:
             icon_data = icon_data[icon_data['zoning_classification'] == selected_zone]
         
-        children = [
-            dl.TileLayer(), 
-            dl.GeoJSON(
-                data=geo_data,
-                style=style
-            ),
-            *create_map_icons(icon_data)
-        ]
+        # dont add icons if no 
+        if icon_data.empty:
+            children = [
+                dl.TileLayer(), 
+                dl.GeoJSON(
+                    data=geo_data,
+                    style=style
+                ),
+            ]
+        else:
+            children = [
+                dl.TileLayer(), 
+                dl.GeoJSON(
+                    data=geo_data,
+                    style=style
+                ),
+                *create_map_icons(icon_data)
+            ]
         
         if selected_zone and isinstance(selected_zone, str):
             icon_data = icon_data[icon_data['zoning_classification'].str.contains(selected_zone, na=False)]

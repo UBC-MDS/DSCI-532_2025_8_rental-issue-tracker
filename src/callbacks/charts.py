@@ -29,12 +29,12 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
             filtered_property_values = issues_values_joined
 
         # If zoning dropdown is cleared (None), show all bars
-        if selected_zone is None or selected_zone == "":
-            aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
-        else:
-            aggregated_property_values = filtered_property_values[
-                filtered_property_values['zoning_classification'] == selected_zone
-            ].groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+       # if selected_zone is None or selected_zone == "":
+        aggregated_property_values = filtered_property_values.groupby('zoning_classification')['total_outstanding'].sum().reset_index()
+       # else:
+       #     aggregated_property_values = filtered_property_values[
+       #         filtered_property_values['zoning_classification'] == selected_zone
+       #     ].groupby('zoning_classification')['total_outstanding'].sum().reset_index()
 
         spec = create_bar_chart(
             data=aggregated_property_values,
@@ -55,9 +55,7 @@ def register_chart_callbacks(app, issues, issues_values_joined, property_values)
         prevent_initial_call=True
     )
     def update_dropdown(pie_signal_data, bar_signal_data):
-        print(f"[DEBUG] Pie chart signal data: {pie_signal_data}")
-        print(f"[DEBUG] Bar chart signal data: {bar_signal_data}")
-        
+    
         # Initialize with no_update for both outputs
         zoning_value = dash.no_update
         region_value = dash.no_update
