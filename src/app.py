@@ -23,6 +23,11 @@ cache.init_app(
 # Load data
 issues_values_joined, property_values, issues, area_boundaries, neighborhoods, boundary_index, style_dictionary = load_data()
 
+# Initialize the app
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.title = "Vancouver Rental Issue Tracker Dashboard"
+server = app.server
+
 # Layout
 app.layout = dbc.Container([
 
