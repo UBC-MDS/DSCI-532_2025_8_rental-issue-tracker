@@ -40,7 +40,6 @@ def create_map_icons(data):
     '''
     return data.apply(create_map_icon,axis=1).to_list()
 
-
 def get_geo_style(feature):
     '''
     Get styling for a given neighborhood border element, based on pie chart color mapping
